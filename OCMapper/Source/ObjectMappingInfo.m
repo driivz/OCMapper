@@ -100,15 +100,15 @@
 }
 
 + (NSString *)oc_enumsPermissionNameKey {
-    return @"Permission";
+    return @"";
 }
 
 + (NSString *)oc_enumsStationOperationNameKey {
-    return @"StationOperation";
+    return @"";
 }
 
 + (NSString *)oc_configurationMapNameKey {
-    return @"ConfigurationMap";
+    return @"";
 }
 
 @end
