@@ -26,6 +26,7 @@
 // THE SOFTWARE.
 
 #import "InCodeMappingProvider.h"
+#import <objc/runtime.h>
 
 #define KEY_FOR_ARRAY_OF_OBJECT_MAPPING_INFOS @"objectMappingInfos"
 
@@ -38,121 +39,139 @@
 @end
 
 @implementation InCodeMappingProvider
-@synthesize mappingDictionary;
-@synthesize dateFormatterDictionary;
 
 #pragma mark - Initialization -
 
-- (id)init
+- (instancetype)init
 {
-	if (self = [super init])
-	{
-		self.automaticallyGenerateInverseMapping = YES;
-		self.mappingDictionary = [NSMutableDictionary dictionary];
-		self.inverseMappingDictionary = [NSMutableDictionary dictionary];
-		self.dateFormatterDictionary = [NSMutableDictionary dictionary];
-		self.inverseDateFormatterDictionary = [NSMutableDictionary dictionary];
+    if (self = [super init])
+    {
+        self.automaticallyGenerateInverseMapping = YES;
+        self.mappingDictionary = [NSMutableDictionary dictionary];
+        self.inverseMappingDictionary = [NSMutableDictionary dictionary];
+        self.dateFormatterDictionary = [NSMutableDictionary dictionary];
+        self.inverseDateFormatterDictionary = [NSMutableDictionary dictionary];
         self.excludeKeysDictionary = [NSMutableDictionary dictionary];
-	}
-	
-	return self;
+    }
+    
+    return self;
 }
 
 #pragma mark - Public Methods -
 
 - (void)mapFromDictionaryKey:(NSString *)dictionaryKey toPropertyKey:(NSString *)propertyKey withObjectType:(Class)objectType forClass:(Class)class
 {
-	ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andObjectType:objectType];
-	NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
-	[self.mappingDictionary setObject:info forKey:key];
+    ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andObjectType:objectType];
+    NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
+    (self.mappingDictionary)[key] = info;
     
-	if (self.automaticallyGenerateInverseMapping)
-	{
-		[self mapFromPropertyKey:propertyKey toDictionaryKey:dictionaryKey forClass:class];
-	}
+    if (self.automaticallyGenerateInverseMapping)
+    {
+        [self mapFromPropertyKey:propertyKey toDictionaryKey:dictionaryKey forClass:class];
+    }
 }
 
 - (void)mapFromDictionaryKey:(NSString *)dictionaryKey toPropertyKey:(NSString *)propertyKey forClass:(Class)class
 {
-	[self mapFromDictionaryKey:dictionaryKey toPropertyKey:propertyKey withObjectType:nil forClass:class];
+    [self mapFromDictionaryKey:dictionaryKey toPropertyKey:propertyKey withObjectType:nil forClass:class];
 }
 
 - (void)mapFromDictionaryKey:(NSString *)dictionaryKey toPropertyKey:(NSString *)propertyKey forClass:(Class)class withTransformer:(MappingTransformer)transformer
 {
-	ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andTransformer:transformer];
-	NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
-	[self.mappingDictionary setObject:info forKey:key];
+    ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andTransformer:transformer];
+    NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
+    (self.mappingDictionary)[key] = info;
 }
 
 - (void)mapFromPropertyKey:(NSString *)propertyKey toDictionaryKey:(NSString *)dictionaryKey forClass:(Class)class {
-	ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andObjectType:nil];
-	NSString *key = [self uniqueKeyForClass:class andKey:propertyKey];
-	[self.inverseMappingDictionary setObject:info forKey:key];
+    ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andObjectType:nil];
+    NSString *key = [self uniqueKeyForClass:class andKey:propertyKey];
+    (self.inverseMappingDictionary)[key] = info;
 }
 
 - (void)mapFromPropertyKey:(NSString *)propertyKey toDictionaryKey:(NSString *)dictionaryKey forClass:(Class)class withTransformer:(MappingTransformer)transformer {
-	ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andTransformer:transformer];
-	NSString *key = [self uniqueKeyForClass:class andKey:propertyKey];
-	[self.inverseMappingDictionary setObject:info forKey:key];
+    ObjectMappingInfo *info = [[ObjectMappingInfo alloc] initWithDictionaryKey:dictionaryKey propertyKey:propertyKey andTransformer:transformer];
+    NSString *key = [self uniqueKeyForClass:class andKey:propertyKey];
+    (self.inverseMappingDictionary)[key] = info;
 }
 
 - (void)excludeMappingForClass:(Class)class withKeys:(NSArray *)keys
 {
-    [self.excludeKeysDictionary setObject:keys forKey:NSStringFromClass(class)];
+    (self.excludeKeysDictionary)[NSStringFromClass(class)] = keys;
 }
 
 - (void)setDateFormatter:(NSDateFormatter *)dateFormatter forPropertyKey:(NSString *)property andClass:(Class)class
 {
-	NSString *key = [self uniqueKeyForClass:class andKey:property];
-	[self.dateFormatterDictionary setObject:dateFormatter forKey:key];
-	
-	if (self.automaticallyGenerateInverseMapping)
-	{
-		[self setDateFormatter:dateFormatter forDictionaryKey:property andClass:class];
-	}
+    NSString *key = [self uniqueKeyForClass:class andKey:property];
+    (self.dateFormatterDictionary)[key] = dateFormatter;
+    
+    if (self.automaticallyGenerateInverseMapping)
+    {
+        [self setDateFormatter:dateFormatter forDictionaryKey:property andClass:class];
+    }
 }
 
 - (void)setDateFormatter:(NSDateFormatter *)dateFormatter forDictionaryKey:(NSString *)dictionaryKey andClass:(Class)class
 {
-	NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
-	[self.inverseDateFormatterDictionary setObject:dateFormatter forKey:key];
+    NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
+    (self.inverseDateFormatterDictionary)[key] = dateFormatter;
 }
 
 #pragma mark - public Methods -
 
 - (NSString *)uniqueKeyForClass:(Class)class andKey:(NSString *)key
 {
-	return [[NSString stringWithFormat:@"%@-%@", NSStringFromClass(class), key] lowercaseString];
+    return [NSString stringWithFormat:@"%@-%@", NSStringFromClass(class), key].lowercaseString;
 }
 
 #pragma mark - MappingProvider Methods -
 
 - (ObjectMappingInfo *)mappingInfoForClass:(Class)class andDictionaryKey:(NSString *)source
 {
-	NSString *key = [self uniqueKeyForClass:class andKey:source];
-	return [self.mappingDictionary objectForKey:key];
+    NSString *key = nil;
+    ObjectMappingInfo *info = nil;
+    Class currentClass = class;
+    
+    while (currentClass && currentClass != [NSObject class] && info == nil)
+    {
+        key = [self uniqueKeyForClass:currentClass andKey:source];
+        info = (self.mappingDictionary)[key];
+        currentClass = class_getSuperclass(currentClass);
+    }
+    
+    return info;
 }
 
 - (ObjectMappingInfo *)mappingInfoForClass:(Class)class andPropertyKey:(NSString *)source {
-	NSString *key = [self uniqueKeyForClass:class andKey:source];
-	return [self.inverseMappingDictionary objectForKey:key];
+    NSString *key = nil;
+    ObjectMappingInfo *info = nil;
+    Class currentClass = class;
+    
+    while (currentClass && currentClass != [NSObject class] && info == nil)
+    {
+        key = [self uniqueKeyForClass:currentClass andKey:source];
+        info = (self.inverseMappingDictionary)[key];
+        currentClass = class_getSuperclass(currentClass);
+    }
+    
+    return info;
 }
 
 - (NSDateFormatter *)dateFormatterForClass:(Class)class andPropertyKey:(NSString *)propertyKey
 {
-	NSString *key = [self uniqueKeyForClass:class andKey:propertyKey];
-	return [self.dateFormatterDictionary objectForKey:key];
+    NSString *key = [self uniqueKeyForClass:class andKey:propertyKey];
+    return (self.dateFormatterDictionary)[key];
 }
 
 - (NSDateFormatter *)dateFormatterForClass:(Class)class andDictionaryKey:(NSString *)dictionaryKey
 {
-	NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
-	return [self.dateFormatterDictionary objectForKey:key];
+    NSString *key = [self uniqueKeyForClass:class andKey:dictionaryKey];
+    return (self.dateFormatterDictionary)[key];
 }
 
 - (NSArray *)excludedKeysForClass:(Class)class
 {
-    return [self.excludeKeysDictionary objectForKey:NSStringFromClass(class)];
+    return (self.excludeKeysDictionary)[NSStringFromClass(class)];
 }
 
 @end

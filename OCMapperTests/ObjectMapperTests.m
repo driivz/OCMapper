@@ -33,8 +33,6 @@
 #import "SpecialUser.h"
 
 @implementation ObjectMapperTests
-@synthesize mapper;
-@synthesize mappingProvider;
 
 #pragma mark - Setup & Teardown -
 

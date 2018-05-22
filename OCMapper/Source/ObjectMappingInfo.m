@@ -28,34 +28,87 @@
 #import "ObjectMappingInfo.h"
 
 @implementation ObjectMappingInfo
-@synthesize dictionaryKey;
-@synthesize propertyKey;
-@synthesize objectType;
 
 #pragma mark - Initialization -
 
-- (id)initWithDictionaryKey:(NSString *)aDictionaryKey propertyKey:(NSString *)aPropertyKey andObjectType:(Class)anObjectType
+- (instancetype)initWithDictionaryKey:(NSString *)aDictionaryKey
+                          propertyKey:(NSString *)aPropertyKey
+                        andObjectType:(Class)anObjectType
 {
-	if (self = [super init])
-	{
-		self.dictionaryKey = aDictionaryKey;
-		self.propertyKey = aPropertyKey;
-		self.objectType = anObjectType;
-	}
-	
-	return self;
+    if (self = [super init])
+    {
+        self.dictionaryKey = aDictionaryKey;
+        self.propertyKey = aPropertyKey;
+        self.objectType = anObjectType;
+    }
+    
+    return self;
 }
 
-- (id)initWithDictionaryKey:(NSString *)aDictionaryKey propertyKey:(NSString *)aPropertyKey andTransformer:(MappingTransformer)transformer
+- (instancetype)initWithDictionaryKey:(NSString *)aDictionaryKey
+                          propertyKey:(NSString *)aPropertyKey
+                       andTransformer:(MappingTransformer)transformer
 {
-	if (self = [super init])
-	{
-		self.dictionaryKey = aDictionaryKey;
-		self.propertyKey = aPropertyKey;
-		self.transformer = transformer;
-	}
-	
-	return self;
+    if (self = [super init])
+    {
+        self.dictionaryKey = aDictionaryKey;
+        self.propertyKey = aPropertyKey;
+        self.transformer = transformer;
+    }
+    
+    return self;
+}
+
++ (NSString *)oc_javaClassNameKey {
+    return @"@class";
+}
+
++ (NSString *)oc_internalClassPreffixKey {
+    return @"DR";
+}
+
++ (NSString *)oc_internalClassSuffixKey {
+    return @"Imp";
+}
+
++ (NSString *)oc_javaLongNumberNameKey {
+    return @"java.lang.Long";
+}
+
++ (NSString *)oc_javaArrayNameKey {
+    return @"java.util.ArrayList";
+}
+
++ (NSString *)oc_javaHashSetNameKey {
+    return @"java.util.HashSet";
+}
+
++ (NSString *)oc_javaHashMapNameKey {
+    return @"java.util.HashMap";
+}
+
++ (NSString *)oc_javaDateNameKey {
+    return @"java.util.Date";
+}
+
++ (NSString *)oc_javaMathTimestampNameKey {
+    return @"java.math.Timestamp";
+}
+
++ (NSString *)oc_javaSQLTimestampNameKey {
+    return @"java.sql.Timestamp";
+}
+
++ (NSString *)oc_enumsPermissionNameKey {
+    return @"Permission";
+}
+
++ (NSString *)oc_enumsStationOperationNameKey {
+    return @"StationOperation";
+}
+
++ (NSString *)oc_configurationMapNameKey {
+    return @"ConfigurationMap";
 }
 
 @end

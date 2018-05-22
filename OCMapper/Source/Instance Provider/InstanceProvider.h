@@ -29,9 +29,8 @@
 
 @protocol InstanceProvider <NSObject>
 
-- (BOOL)canHandleClass:(Class)clazz;
 - (id)emptyInstanceForClass:(Class)clazz;
-- (id)emptyCollectionInstance;
+@property (nonatomic, readonly, strong) id emptyCollectionInstance;
 - (id)upsertObject:(NSObject *)object error:(NSError **)error;
 - (NSString *)propertyNameForObject:(NSObject *)object byCaseInsensitivePropertyName:(NSString *)caseInsensitivePropertyName;
 

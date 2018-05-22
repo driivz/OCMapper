@@ -30,8 +30,20 @@
 
 @interface NSObject (ObjectMapper)
 
-+ (id)objectFromDictionary:(NSDictionary *)dictionary;
++ (instancetype)objectFromDictionary:(NSDictionary *)dictionary;
 - (NSDictionary *)dictionary;
 - (NSDictionary *)dictionaryWrappedInParentWithKey:(NSString *)key;
+
+- (NSArray *)arrayToServer;
+
+@property (nonatomic, readonly, strong) Class internalClassName;
+
++ (NSString *)javaClassName;
+
++ (id)jsonMappedObject;
++ (id)jsonMappedValue:(id)value;
+
+@property (nonatomic, readonly, copy) NSDate *javaTimestampToNSDate;
+@property (nonatomic, readonly, copy) NSArray *javaTimestamp;
 
 @end

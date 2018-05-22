@@ -45,7 +45,32 @@ typedef id (^MappingTransformer)(id currentNode, id parentNode);
 @property (nonatomic, copy) MappingTransformer transformer;
 @property (nonatomic, assign) Class objectType;
 
-- (id)initWithDictionaryKey:(NSString *)aDictionaryKey propertyKey:(NSString *)aPropertyKey andObjectType:(Class)anObjectType;
-- (id)initWithDictionaryKey:(NSString *)aDictionaryKey propertyKey:(NSString *)aPropertyKey andTransformer:(MappingTransformer)transformer;
+- (instancetype)initWithDictionaryKey:(NSString *)aDictionaryKey
+                          propertyKey:(NSString *)aPropertyKey
+                        andObjectType:(Class)anObjectType NS_DESIGNATED_INITIALIZER;
 
+- (instancetype)initWithDictionaryKey:(NSString *)aDictionaryKey
+                          propertyKey:(NSString *)aPropertyKey
+                       andTransformer:(MappingTransformer)transformer NS_DESIGNATED_INITIALIZER;
+
+- (instancetype)init NS_UNAVAILABLE;
+
++ (NSString *)oc_javaClassNameKey;
++ (NSString *)oc_internalClassPreffixKey;
++ (NSString *)oc_internalClassSuffixKey;
+
++ (NSString *)oc_javaLongNumberNameKey;
+
++ (NSString *)oc_javaArrayNameKey;
++ (NSString *)oc_javaHashSetNameKey;
++ (NSString *)oc_javaHashMapNameKey;
+
++ (NSString *)oc_javaDateNameKey;
++ (NSString *)oc_javaMathTimestampNameKey;
++ (NSString *)oc_javaSQLTimestampNameKey;
+
++ (NSString *)oc_enumsPermissionNameKey;
++ (NSString *)oc_enumsStationOperationNameKey;
+
++ (NSString *)oc_configurationMapNameKey;
 @end

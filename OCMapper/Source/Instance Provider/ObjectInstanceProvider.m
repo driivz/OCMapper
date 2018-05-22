@@ -35,88 +35,75 @@
 
 #pragma mark - Initialization -
 
-- (id)init
+- (instancetype)init
 {
-	if (self = [super init])
-	{
-		self.propertyNameDictionary = [NSMutableDictionary dictionary];
-	}
-	
-	return  self;
+    if (self = [super init])
+    {
+        self.propertyNameDictionary = [NSMutableDictionary dictionary];
+    }
+    
+    return  self;
 }
 
 #pragma mark - InstanceProvider Methods -
 
-- (BOOL)canHandleClass:(Class)class
-{
-	static Class managedObjectClass = nil;
-	
-	if (!managedObjectClass)
-		managedObjectClass = NSClassFromString(@"NSManagedObject");
-	
-	return ([class isSubclassOfClass:managedObjectClass]) ? NO : YES;
-}
-
 - (id)emptyInstanceForClass:(Class)class
 {
-	return [[class alloc] init];
+    return [[class alloc] init];
 }
 
 - (id)emptyCollectionInstance
 {
-	return [NSMutableArray array];
+    return [NSMutableArray array];
 }
 
 - (id)upsertObject:(NSObject *)object error:(NSError **)error;
 {
-	// Object not stored anywhere and therefore no need to upsert
-	// This is specifically made for NSManagedObjects used by ManagedObjectInstanceProvider
-	
-	return object;
+    return object;
 }
 
 - (NSString *)propertyNameForObject:(NSObject *)object byCaseInsensitivePropertyName:(NSString *)caseInsensitivePropertyName
 {
-	NSString *result = nil;
-	Class currentClass = [object class];
-	
-	NSString *key = [NSString stringWithFormat:@"%@.%@", NSStringFromClass(currentClass), caseInsensitivePropertyName];
-	
-	if (self.propertyNameDictionary[key])
-		return self.propertyNameDictionary[key];
-	
-	// Support underscore case (EX: map first_name to firstName)
-	caseInsensitivePropertyName = [caseInsensitivePropertyName stringByReplacingOccurrencesOfString:@"_" withString:@""];
-	
-	while (currentClass && currentClass != [NSObject class])
-	{
-		unsigned int outCount, i;
-		objc_property_t *properties = class_copyPropertyList(currentClass, &outCount);
-		
-		for (i = 0; i < outCount; i++)
-		{
-			objc_property_t property = properties[i];
-			NSString *propertyName = [NSString stringWithUTF8String:property_getName(property)];
-			
-			if ([[propertyName lowercaseString] isEqual:[caseInsensitivePropertyName lowercaseString]])
-			{
-				result = propertyName;
-				break;
-			}
-		}
-		
-		free(properties);
-		
-		if (result)
-		{
-			self.propertyNameDictionary[key] = result;
-			return result;
-		}
-		
-		currentClass = class_getSuperclass(currentClass);
-	}
-	
-	return nil;
+    // Support underscore case (EX: map first_name to firstName)
+    caseInsensitivePropertyName = [caseInsensitivePropertyName stringByReplacingOccurrencesOfString:@"_" withString:@""];
+    
+    Class currentClass = [object class];
+    NSString *currentClassName = NSStringFromClass(currentClass);
+    
+    NSString *key = [NSString stringWithFormat:@"%@.%@", currentClassName, caseInsensitivePropertyName];
+    
+    __weak typeof(self) weak = self;
+    NSString *(^checkProcessedKyes)(NSString *) = ^(NSString *key) {
+        return weak.propertyNameDictionary[key];
+    };
+    
+    NSString *value = checkProcessedKyes(key);
+    if (value.length)
+    {
+        return value;
+    }
+    
+    unsigned int outCount, i;
+    
+    //need support inheritance
+    while (currentClass && currentClass != [NSObject class])
+    {
+        objc_property_t *properties = class_copyPropertyList(currentClass, &outCount);
+        
+        for (i = 0; i < outCount; ++i)
+        {
+            objc_property_t property = properties[i];
+            NSString *propertyName = @(property_getName(property));
+            NSString *propertyKey = [NSString stringWithFormat:@"%@.%@", currentClassName, propertyName];
+            self.propertyNameDictionary[propertyKey] = propertyName;
+        }
+        
+        free(properties);
+        
+        currentClass = class_getSuperclass(currentClass);
+    }
+    
+    return checkProcessedKyes(key);
 }
 
 @end

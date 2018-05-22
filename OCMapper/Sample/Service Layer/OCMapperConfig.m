@@ -18,27 +18,27 @@
 
 + (void)configure
 {
-	InCodeMappingProvider *inCodeMappingProvider = [[InCodeMappingProvider alloc] init];
-	CommonLoggingProvider *commonLoggingProvider = [[CommonLoggingProvider alloc] initWithLogLevel:LogLevelInfo];
-	
-	[[ObjectMapper sharedInstance] setMappingProvider:inCodeMappingProvider];
-	[[ObjectMapper sharedInstance] setLoggingProvider:commonLoggingProvider];
-	
-	/******************* Any custom mapping would go here **********************/
-	
-	// Map from key 'results' to property 'results' of type 'GoogleSearchResult' which is a property of 'GoogleSearchResponseData' class
-	// If the class was named 'Result' it would be mapped automatically, and there would be no need to write any code
-	[inCodeMappingProvider mapFromDictionaryKey:@"results"
-								  toPropertyKey:@"results"
-								 withObjectType:[GoogleSearchResult class]
-									   forClass:[GoogleSearchResponseData class]];
-	
-	// Map from key 'responseData' to property 'responseData' of type 'GoogleSearchResponseData' which is a property of 'GoogleSearchResponse' class
-	// If the class was named 'ResponseData' it would be mapped automatically, and there would be no need to write any code
-	[inCodeMappingProvider mapFromDictionaryKey:@"responseData"
-								  toPropertyKey:@"responseData"
-								 withObjectType:[GoogleSearchResponseData class]
-									   forClass:[GoogleSearchResponse class]];
+    InCodeMappingProvider *inCodeMappingProvider = [[InCodeMappingProvider alloc] init];
+    CommonLoggingProvider *commonLoggingProvider = [[CommonLoggingProvider alloc] initWithLogLevel:LogLevelInfo];
+    
+    [ObjectMapper sharedInstance].mappingProvider = inCodeMappingProvider;
+    [ObjectMapper sharedInstance].loggingProvider = commonLoggingProvider;
+    
+    /******************* Any custom mapping would go here **********************/
+    
+    // Map from key 'results' to property 'results' of type 'GoogleSearchResult' which is a property of 'GoogleSearchResponseData' class
+    // If the class was named 'Result' it would be mapped automatically, and there would be no need to write any code
+    [inCodeMappingProvider mapFromDictionaryKey:@"results"
+                                  toPropertyKey:@"results"
+                                 withObjectType:[GoogleSearchResult class]
+                                       forClass:[GoogleSearchResponseData class]];
+    
+    // Map from key 'responseData' to property 'responseData' of type 'GoogleSearchResponseData' which is a property of 'GoogleSearchResponse' class
+    // If the class was named 'ResponseData' it would be mapped automatically, and there would be no need to write any code
+    [inCodeMappingProvider mapFromDictionaryKey:@"responseData"
+                                  toPropertyKey:@"responseData"
+                                 withObjectType:[GoogleSearchResponseData class]
+                                       forClass:[GoogleSearchResponse class]];
 }
 
 @end

@@ -27,15 +27,15 @@
 
 #import <Foundation/Foundation.h>
 
-typedef  enum{
-	LogLevelInfo = 1,
-	LogLevelWarning = 2,
-	LogLevelError = 3
-}LogLevel;
+typedef  NS_ENUM(unsigned int, LogLevel) {
+    LogLevelInfo = 1,
+    LogLevelWarning = 2,
+    LogLevelError = 3
+};
 
 @protocol LoggingProvider <NSObject>
 
 - (void)log:(NSString *)string withLevel:(LogLevel)logLevel;
-- (id)initWithLogLevel:(LogLevel)logLevel;
+- (instancetype)initWithLogLevel:(LogLevel)logLevel;
 
 @end

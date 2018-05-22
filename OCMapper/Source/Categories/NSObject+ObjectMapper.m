@@ -26,22 +26,84 @@
 // THE SOFTWARE.
 
 #import "NSObject+ObjectMapper.h"
+#import "ObjectMappingInfo.h"
 
 @implementation NSObject (ObjectMapper)
 
-+ (id)objectFromDictionary:(NSDictionary *)dictionary
++ (instancetype)objectFromDictionary:(NSDictionary *)dictionary
 {
-	return [[ObjectMapper sharedInstance] objectFromSource:dictionary toInstanceOfClass:[self class]];
+    return [[ObjectMapper sharedInstance] objectFromSource:dictionary toInstanceOfClass:[self class]];
+}
+
+- (Class)internalClassName {
+    NSString *serverClassName = self.description;
+    NSString *className = [serverClassName copy];
+    
+    NSArray *components = [serverClassName componentsSeparatedByString:@"."];
+    
+    if (components.count > 1) {
+        className = components.lastObject;
+        className = [[ObjectMappingInfo oc_internalClassPreffixKey] stringByAppendingString:className];
+        className = [className stringByReplacingOccurrencesOfString:[ObjectMappingInfo oc_internalClassSuffixKey] withString:@""];
+    }
+    
+    Class _class = NSClassFromString(className);
+    
+    return _class;
+}
+
++ (NSString *)javaClassName {
+    return @"";
+}
+
++ (id)jsonMappedObject {
+    return nil;
+}
+
++ (id)jsonMappedValue:(id)value {
+    return value;
+}
+
+- (NSArray *)javaTimestamp {
+    return @[];
 }
 
 - (NSDictionary *)dictionary
 {
-	return [[ObjectMapper sharedInstance] dictionaryFromObject:self];
+    NSMutableDictionary *properties = [NSMutableDictionary dictionary];
+    
+    NSString *javaClassName = [[self class] javaClassName];
+    if (javaClassName.length)
+    {
+        properties[[ObjectMappingInfo oc_javaClassNameKey]] = javaClassName;
+    }
+    
+    [properties addEntriesFromDictionary:[[ObjectMapper sharedInstance] dictionaryFromObject:self]];
+    
+    return properties;
 }
 
 - (NSDictionary *)dictionaryWrappedInParentWithKey:(NSString *)key
 {
-	return [NSDictionary dictionaryWithObject:[self dictionary] forKey:key];
+    return @{key: [self dictionary]};
+}
+
+- (NSDate *)javaTimestampToNSDate {
+    id object = self;
+    if ([object isKindOfClass:[NSNull class]] || object == nil) {
+        return nil;
+    }
+    
+    if ([object isKindOfClass:[NSArray class]]) {
+        object = [object lastObject];
+    }
+    
+    NSTimeInterval timestampSeconds = [object doubleValue] / 1000.0;
+    return [NSDate dateWithTimeIntervalSince1970:timestampSeconds];
+}
+
+- (NSArray *)arrayToServer {
+    return [[ObjectMapper sharedInstance] dictionaryFromObject:self];
 }
 
 @end

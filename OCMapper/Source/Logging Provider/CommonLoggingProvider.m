@@ -32,22 +32,21 @@
 @end
 
 @implementation CommonLoggingProvider
-@synthesize logLevel;
 
-- (id)initWithLogLevel:(LogLevel)aLogLevel
+- (instancetype)initWithLogLevel:(LogLevel)aLogLevel
 {
-	if (self = [super init])
-	{
-		self.logLevel = aLogLevel;
-	}
-	
-	return self;
+    if (self = [super init])
+    {
+        self.logLevel = aLogLevel;
+    }
+    
+    return self;
 }
 
 - (void)log:(NSString *)string withLevel:(LogLevel)level
 {
-	if (level >= self.logLevel)
-		NSLog(@"%@", string);
+    if (level >= self.logLevel)
+        NSLog(@"%@", string);
 }
 
 @end

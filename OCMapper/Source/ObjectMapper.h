@@ -34,11 +34,13 @@
 @property (nonatomic, strong) NSDateFormatter *defaultDateFormatter;
 @property (nonatomic, strong) id <MappingProvider> mappingProvider;
 @property (nonatomic, strong) id <LoggingProvider> loggingProvider;
-@property (nonatomic, assign) BOOL normalizeDictionary;
 
 + (ObjectMapper *)sharedInstance;
 - (id)objectFromSource:(id)source toInstanceOfClass:(Class)clazz;
 - (id)dictionaryFromObject:(NSObject *)object;
-- (void)addInstanceProvider:(id <InstanceProvider>)instanceProvider;
+
+- (NSDictionary *)dr_processDictionaryFromArray:(NSArray *)array;
+
++ (id)mapDTONode:(id)node;
 
 @end

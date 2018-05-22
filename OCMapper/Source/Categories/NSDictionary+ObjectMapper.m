@@ -31,17 +31,17 @@
 
 - (id)objectForClass:(Class)class
 {
-	return [[ObjectMapper sharedInstance] objectFromSource:self toInstanceOfClass:class];
+    return [[ObjectMapper sharedInstance] objectFromSource:self toInstanceOfClass:class];
 }
 
 - (NSDictionary *)dictionaryFromObject:(NSObject *)object
 {
-	return [[ObjectMapper sharedInstance] dictionaryFromObject:object];
+    return [[ObjectMapper sharedInstance] dictionaryFromObject:object];
 }
 
 - (NSDictionary *)dictionaryFromObject:(NSObject *)object wrappedInParentWithKey:(NSString *)key
 {
-	return [NSDictionary dictionaryWithObject:[self dictionaryFromObject:object] forKey:key];
+    return @{key: [self dictionaryFromObject:object]};
 }
 
 @end
