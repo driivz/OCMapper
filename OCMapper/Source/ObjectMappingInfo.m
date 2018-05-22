@@ -60,15 +60,15 @@
 }
 
 + (NSString *)oc_javaClassNameKey {
-    return @"@class";
+    return @"class";
 }
 
 + (NSString *)oc_internalClassPreffixKey {
-    return @"DR";
+    return @"";
 }
 
 + (NSString *)oc_internalClassSuffixKey {
-    return @"Imp";
+    return @"";
 }
 
 + (NSString *)oc_javaLongNumberNameKey {
