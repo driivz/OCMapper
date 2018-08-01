@@ -107,6 +107,10 @@
     return @"";
 }
 
++ (NSString *)oc_enumsStationErrorCodeKey {
+    return @"";
+}
+
 + (NSString *)oc_configurationMapNameKey {
     return @"";
 }

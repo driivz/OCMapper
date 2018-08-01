@@ -423,7 +423,8 @@
     }
     else if ([value.firstObject isEqualToString:[ObjectMappingInfo oc_javaArrayNameKey]] ||
              [value.firstObject isEqualToString:[ObjectMappingInfo oc_javaHashSetNameKey]] ||
-             [value.firstObject isEqualToString:[ObjectMappingInfo oc_enumsPermissionNameKey]]) {
+             [value.firstObject isEqualToString:[ObjectMappingInfo oc_enumsPermissionNameKey]] ||
+             [value.firstObject isEqualToString:[ObjectMappingInfo oc_enumsStationErrorCodeKey]]) {
         for (id objectInArray in value.lastObject) {
             if ([objectInArray isKindOfClass:[NSDictionary class]]) {
                 NSString *collectionClassName = objectInArray[[ObjectMappingInfo oc_javaClassNameKey]];

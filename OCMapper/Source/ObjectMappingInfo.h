@@ -71,6 +71,7 @@ typedef id (^MappingTransformer)(id currentNode, id parentNode);
 
 + (NSString *)oc_enumsPermissionNameKey;
 + (NSString *)oc_enumsStationOperationNameKey;
++ (NSString *)oc_enumsStationErrorCodeKey;
 
 + (NSString *)oc_configurationMapNameKey;
 @end
