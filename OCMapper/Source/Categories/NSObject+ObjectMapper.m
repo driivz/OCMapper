@@ -37,15 +37,12 @@
 
 - (Class)internalClassName {
     NSString *serverClassName = self.description;
-    NSString *className = [serverClassName copy];
     
     NSArray *components = [serverClassName componentsSeparatedByString:@"."];
     
-    if (components.count > 1) {
-        className = components.lastObject;
-        className = [[ObjectMappingInfo oc_internalClassPreffixKey] stringByAppendingString:className];
-        className = [className stringByReplacingOccurrencesOfString:[ObjectMappingInfo oc_internalClassSuffixKey] withString:@""];
-    }
+    NSString *className = components.lastObject;
+    className = [[ObjectMappingInfo oc_internalClassPreffixKey] stringByAppendingString:className];
+    className = [className stringByReplacingOccurrencesOfString:[ObjectMappingInfo oc_internalClassSuffixKey] withString:@""];
     
     Class _class = NSClassFromString(className);
     

@@ -47,11 +47,12 @@
     if (self = [super init])
     {
         self.automaticallyGenerateInverseMapping = YES;
-        self.mappingDictionary = [NSMutableDictionary dictionary];
-        self.inverseMappingDictionary = [NSMutableDictionary dictionary];
-        self.dateFormatterDictionary = [NSMutableDictionary dictionary];
+        
+        self.mappingDictionary              = [NSMutableDictionary dictionary];
+        self.inverseMappingDictionary       = [NSMutableDictionary dictionary];
+        self.dateFormatterDictionary        = [NSMutableDictionary dictionary];
         self.inverseDateFormatterDictionary = [NSMutableDictionary dictionary];
-        self.excludeKeysDictionary = [NSMutableDictionary dictionary];
+        self.excludeKeysDictionary          = [NSMutableDictionary dictionary];
     }
     
     return self;

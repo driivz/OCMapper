@@ -462,11 +462,12 @@
 
 - (Class)classFromString:(NSString *)className
 {
-    Class result;
+    Class result = Nil;
     
-    if ((self.mappedClassNames)[className])
+    NSString *mappedClass = (self.mappedClassNames)[className];
+    if (mappedClass.length)
     {
-        result = NSClassFromString((self.mappedClassNames)[className]);
+        result = NSClassFromString(mappedClass);
         
         if (result) {
             return result;
@@ -501,7 +502,7 @@
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleNameKey];
     
     if (className.length) {
-        className = [className stringByReplacingCharactersInRange:NSMakeRange(0,1)
+        className = [className stringByReplacingCharactersInRange:NSMakeRange(0, 1)
                                                        withString:[className substringToIndex:1].capitalizedString];
     }
     
@@ -553,7 +554,7 @@
         }
     }
     
-    return nil;
+    return result;
 }
 
 - (NSDate *)dateFromString:(NSString *)string forProperty:(NSString *)property andClass:(Class)class
@@ -639,11 +640,12 @@
     const char *type = property_getAttributes(class_getProperty(class, property.UTF8String));
     NSString *typeString = @(type);
     NSArray *attributes = [typeString componentsSeparatedByString:@","];
-    NSString *typeAttribute = attributes[0];
+    NSString *typeAttribute = attributes.firstObject;
     className = [[[typeAttribute substringFromIndex:1]
                   stringByReplacingOccurrencesOfString:@"@" withString:@""]
                  stringByReplacingOccurrencesOfString:@"\"" withString:@""];
     
+    NSAssert(className.length, @"Wrong Class for key: %@", key);
     if (className.length) {
         self.mappedPropertyNames[key] = className;
     }
