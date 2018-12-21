@@ -39,7 +39,7 @@
 {
     if (self = [super init])
     {
-        self.propertyNameDictionary = [NSMutableDictionary dictionary];
+        self.propertyNameDictionary = [NSMutableDictionary new];
     }
     
     return  self;
@@ -74,7 +74,7 @@
     
     __weak typeof(self) weak = self;
     NSString *(^checkProcessedKyes)(NSString *) = ^(NSString *key) {
-        return weak.propertyNameDictionary[key];
+        return [weak.propertyNameDictionary objectForKey:key];
     };
     
     NSString *value = checkProcessedKyes(key);
@@ -95,7 +95,7 @@
             objc_property_t property = properties[i];
             NSString *propertyName = @(property_getName(property));
             NSString *propertyKey = [NSString stringWithFormat:@"%@.%@", currentClassName, propertyName];
-            self.propertyNameDictionary[propertyKey] = propertyName;
+            [self.propertyNameDictionary setObject:propertyName forKey:propertyKey];
         }
         
         free(properties);

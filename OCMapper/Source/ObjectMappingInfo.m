@@ -33,10 +33,8 @@
 
 - (instancetype)initWithDictionaryKey:(NSString *)aDictionaryKey
                           propertyKey:(NSString *)aPropertyKey
-                        andObjectType:(Class)anObjectType
-{
-    if (self = [super init])
-    {
+                        andObjectType:(Class)anObjectType {
+    if (self = [super init]) {
         self.dictionaryKey = aDictionaryKey;
         self.propertyKey = aPropertyKey;
         self.objectType = anObjectType;
@@ -47,10 +45,8 @@
 
 - (instancetype)initWithDictionaryKey:(NSString *)aDictionaryKey
                           propertyKey:(NSString *)aPropertyKey
-                       andTransformer:(MappingTransformer)transformer
-{
-    if (self = [super init])
-    {
+                       andTransformer:(MappingTransformer)transformer {
+    if (self = [super init]) {
         self.dictionaryKey = aDictionaryKey;
         self.propertyKey = aPropertyKey;
         self.transformer = transformer;

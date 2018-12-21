@@ -56,8 +56,7 @@
 
 #pragma mark - initialization -
 
-+ (ObjectMapper *)sharedInstance
-{
++ (ObjectMapper *)sharedInstance {
     static ObjectMapper *singleton;
     static dispatch_once_t onceToken;
     
@@ -68,14 +67,12 @@
     return singleton;
 }
 
-- (instancetype)init
-{
-    if (self = [super init])
-    {
+- (instancetype)init {
+    if (self = [super init]) {
         self.instanceProvider = [[ObjectInstanceProvider alloc] init];
         
-        self.mappedClassNames = [NSMutableDictionary dictionary];
-        self.mappedPropertyNames = [NSMutableDictionary dictionary];
+        self.mappedClassNames = [NSMutableDictionary new];
+        self.mappedPropertyNames = [NSMutableDictionary new];
     }
     
     return self;
@@ -83,51 +80,44 @@
 
 #pragma mark - Public Methods -
 
-- (id)objectFromSource:(id)source toInstanceOfClass:(Class)class
-{
-    if ([source isKindOfClass:[NSDictionary class]])
-    {
+- (id)objectFromSource:(id)source toInstanceOfClass:(Class)class {
+    id object = nil;
+    if ([source isKindOfClass:[NSDictionary class]]) {
         ILog(@"____________________ Mapping Dictionary to instance [%@] ____________________", NSStringFromClass(class));
-        return [self dr_processDictionary:source forClass:class];
+        object = [self dr_processDictionary:source forClass:class];
     }
-    else if ([source isKindOfClass:[NSArray class]])
-    {
+    else if ([source isKindOfClass:[NSArray class]]) {
         ILog(@"____________________   Mapping Array to instance [%@] ____________________", NSStringFromClass(class));
-        return [self processArray:source forClass:class];
+        object = [self processArray:source forClass:class];
     }
-    else
-    {
+    else {
         ILog(@"____________________   Mapping field [%@] ____________________", NSStringFromClass(class));
-        return source;
+        object = source;
     }
+    
+    return object;
 }
 
-- (id)dictionaryFromObject:(__kindof NSObject *)object
-{
-    if ([object isKindOfClass:[NSArray class]])
-    {
+- (id)dictionaryFromObject:(__kindof NSObject *)object {
+    if ([object isKindOfClass:[NSArray class]]) {
         return [self dr_processDictionaryFromArray:object];
     }
-    else
-    {
+    else {
         return [self processDictionaryFromObject:object];
     }
 }
 
 #pragma mark - Private Methods -
 
-- (NSArray *)dr_processDictionaryFromArray:(NSArray *)array
-{
+- (NSArray *)dr_processDictionaryFromArray:(NSArray *)array {
     NSObject *object = array.firstObject;
-    if ([NSBundle mainBundle] != [NSBundle bundleForClass:object.class])
-    {
+    if ([NSBundle mainBundle] != [NSBundle bundleForClass:object.class]) {
         // is CFTypes: NSString, NSnumber etc
         return @[[ObjectMappingInfo oc_javaArrayNameKey], array];
     }
     
     NSMutableArray *objects = [NSMutableArray array];
-    for (id valueInArray in array)
-    {
+    for (id valueInArray in array) {
         NSMutableDictionary *dic = [self dictionaryFromObject:valueInArray];
         dic[[ObjectMappingInfo oc_javaClassNameKey]] = [[valueInArray class] javaClassName];
         [objects addObject:dic];
@@ -136,26 +126,22 @@
     return @[[ObjectMappingInfo oc_javaArrayNameKey], [objects copy]];
 }
 
-- (NSArray *)processDictionaryFromArray:(NSArray *)array
-{
+- (NSArray *)processDictionaryFromArray:(NSArray *)array {
     NSMutableArray *result = [NSMutableArray array];
     
-    for (id valueInArray in array)
-    {
+    for (id valueInArray in array) {
         [result addObject:[self dictionaryFromObject:valueInArray]];
     }
     
     return result;
 }
 
-- (id)processDictionaryFromObject:(NSObject *)object
-{
+- (id)processDictionaryFromObject:(NSObject *)object {
     NSMutableDictionary *props = [NSMutableDictionary dictionary];
     
     Class currentClass = [object class];
     
-    while (currentClass && currentClass != [NSObject class])
-    {
+    while (currentClass && currentClass != [NSObject class]) {
         unsigned int outCount, i;
         objc_property_t *properties = class_copyPropertyList(currentClass, &outCount);
         NSArray *excludedKeys = [self.mappingProvider excludedKeysForClass:currentClass];
@@ -171,6 +157,10 @@
             
             Class class = NSClassFromString([self typeForProperty:originalPropertyName andClass:[object class]]);
             id propertyValue = [object valueForKey:originalPropertyName];
+            if (!propertyValue) {
+                //skip if nothing
+                continue;
+            }
             
             ObjectMappingInfo *mapingInfo = [self.mappingProvider mappingInfoForClass:[object class] andPropertyKey:originalPropertyName];
             NSString *propertyName = (mapingInfo) ? mapingInfo.dictionaryKey : originalPropertyName;
@@ -180,8 +170,7 @@
                 props[propertyName] = propertyValue;
             }
             // If class is in the main bundle it's an application specific class
-            else if (propertyValue && [NSBundle mainBundle] == [NSBundle bundleForClass:[propertyValue class]])
-            {
+            else if (propertyValue && [NSBundle mainBundle] == [NSBundle bundleForClass:[propertyValue class]]) {
                 NSMutableDictionary *dic = [NSMutableDictionary dictionary];
                 dic[[ObjectMappingInfo oc_javaClassNameKey]] = [class javaClassName];
                 
@@ -190,19 +179,15 @@
                 props[propertyName] = dic;
             }
             // It's not in the main bundle so it's a Cocoa Class
-            else
-            {
+            else {
                 NSString *jsonMappedObject = [class jsonMappedObject];
-                if (class == [NSDate class])
-                {
+                if (class == [NSDate class]) {
                     propertyValue = [propertyValue javaTimestamp];
                 }
-                else if ([propertyValue isKindOfClass:[NSArray class]] || [propertyValue isKindOfClass:[NSSet class]])
-                {
+                else if ([propertyValue isKindOfClass:[NSArray class]] || [propertyValue isKindOfClass:[NSSet class]]) {
                     propertyValue = [self dr_processDictionaryFromArray:propertyValue];
                 }
-                else if (jsonMappedObject)
-                {
+                else if (jsonMappedObject) {
                     propertyValue = [class jsonMappedValue:propertyValue];
                 }
                 
@@ -221,8 +206,7 @@
 
 // Here we normalize dictionary made for flat-to-complex-object mapping
 // For instance in a mapping from "city" to "address.city" we break down "address" and "city"
-- (NSDictionary *)normalizedDictionaryFromDictionary:(NSDictionary *)source forClass:(Class)class
-{
+- (NSDictionary *)normalizedDictionaryFromDictionary:(NSDictionary *)source forClass:(Class)class {
     NSMutableDictionary *newDictionary = [source mutableCopy];
     [newDictionary removeObjectForKey:[ObjectMappingInfo oc_javaClassNameKey]];
     
@@ -277,8 +261,7 @@
             }
         }];
     }
-    else if (className.length > 0)
-    {
+    else if (className.length > 0) {
         object = [self processDictionary:value forClass:class];
     }
     else {
@@ -292,14 +275,12 @@
     return object;
 }
 
-- (id)processDictionary:(NSDictionary *)source forClass:(Class)class
-{
+- (id)processDictionary:(NSDictionary *)source forClass:(Class)class {
     NSDictionary *normalizedSource = [self normalizedDictionaryFromDictionary:source forClass:class];
     
     id object = [self.instanceProvider emptyInstanceForClass:class];
     
-    for (NSString *key in normalizedSource)
-    {
+    for (NSString *key in normalizedSource) {
         @autoreleasepool
         {
             ObjectMappingInfo *mappingInfo = [self.mappingProvider mappingInfoForClass:class andDictionaryKey:key];
@@ -309,85 +290,69 @@
             Class objectType;
             id nestedObject;
             
-            if (mappingInfo)
-            {
+            if (mappingInfo) {
                 propertyName = [self.instanceProvider propertyNameForObject:object byCaseInsensitivePropertyName:mappingInfo.propertyKey];
                 objectType = mappingInfo.objectType;
                 mappingTransformer = mappingInfo.transformer;
             }
-            else
-            {
+            else {
                 propertyName = [self.instanceProvider propertyNameForObject:object byCaseInsensitivePropertyName:key];
                 
-                if (propertyName && ([value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSArray class]]))
-                {
-                    if ([value isKindOfClass:[NSDictionary class]])
-                    {
+                if (propertyName && ([value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSArray class]])) {
+                    if ([value isKindOfClass:[NSDictionary class]]) {
                         objectType = [self classFromString:[self typeForProperty:propertyName andClass:class]];
                     }
                     
-                    if (!objectType)
-                    {
+                    if (!objectType) {
                         objectType = [self classFromString:key];
                     }
                 }
             }
             
-            if (class && object && propertyName.length && [object respondsToSelector:NSSelectorFromString(propertyName)])
-            {
+            if (class && object && propertyName.length && [object respondsToSelector:NSSelectorFromString(propertyName)]) {
                 ILog(@"Mapping key(%@) to property(%@) from data(%@)", key, propertyName, [value class]);
                 
-                if (mappingTransformer)
-                {
+                if (mappingTransformer) {
                     nestedObject = mappingTransformer(value, source);
                 }
-                else if ([value isKindOfClass:[NSDictionary class]])
-                {
+                else if ([value isKindOfClass:[NSDictionary class]]) {
                     nestedObject = [self dr_processDictionary:value forClass:objectType];
                 }
-                else if ([value isKindOfClass:[NSArray class]])
-                {
+                else if ([value isKindOfClass:[NSArray class]]) {
                     nestedObject = [self processArray:value forClass:objectType];
                 }
-                else
-                {
+                else {
                     NSString *propertyTypeString = [self typeForProperty:propertyName andClass:class];
                     
                     // Convert NSString to NSDate if needed
-                    if ([propertyTypeString isEqualToString:@"NSDate"])
-                    {
-                        if ([value isKindOfClass:[NSDate class]])
-                        {
+                    if ([propertyTypeString isEqualToString:@"NSDate"]) {
+                        if ([value isKindOfClass:[NSDate class]]) {
                             nestedObject = value;
                         }
-                        else if ([value isKindOfClass:[NSString class]])
-                        {
+                        else if ([value isKindOfClass:[NSString class]]) {
                             nestedObject = [self dateFromString:value forProperty:propertyName andClass:class];
                         }
                     }
                     // Convert NSString to NSNumber if needed
-                    else if ([propertyTypeString isEqualToString:@"NSNumber"] && [value isKindOfClass:[NSString class]])
-                    {
+                    else if ([propertyTypeString isEqualToString:@"NSNumber"] && [value isKindOfClass:[NSString class]]) {
                         nestedObject = @([value doubleValue]);
                     }
                     // Convert NSNumber to NSString if needed
-                    else if ([propertyTypeString isEqualToString:@"NSString"] && [value isKindOfClass:[NSNumber class]])
-                    {
+                    else if ([propertyTypeString isEqualToString:@"NSString"] && [value isKindOfClass:[NSNumber class]]) {
                         nestedObject = [value stringValue];
                     }
-                    else
-                    {
+                    else {
                         nestedObject = value;
                     }
                 }
                 
-                if ([nestedObject isKindOfClass:[NSNull class]])
+                if ([nestedObject isKindOfClass:[NSNull class]]) {
                     nestedObject = nil;
+                }
                 
                 [object setValue:nestedObject forKey:propertyName];
             }
-            else
-            {
+            else {
                 WLog(@"Unable to map from  key(%@) to property(%@) for class (%@)", key, propertyName, NSStringFromClass(class));
             }
         }
@@ -460,13 +425,11 @@
     return collection;
 }
 
-- (Class)classFromString:(NSString *)className
-{
+- (Class)classFromString:(NSString *)className {
     Class result = Nil;
     
-    NSString *mappedClass = (self.mappedClassNames)[className];
-    if (mappedClass.length)
-    {
+    NSString *mappedClass = [self.mappedClassNames objectForKey:className];
+    if (mappedClass.length) {
         result = NSClassFromString(mappedClass);
         
         if (result) {
@@ -474,14 +437,13 @@
         }
     }
     
-    __weak typeof(self) weakSelf = self;
+    __weak typeof(self) weak = self;
     
     Class (^testClassName)(NSString *) = ^(NSString *classNameToTest) {
         Class clazz = NSClassFromString(classNameToTest);
         
-        if (clazz)
-        {
-            (weakSelf.mappedClassNames)[className] = classNameToTest;
+        if (clazz) {
+            [weak.mappedClassNames setObject:classNameToTest forKey:className];
         }
         
         return clazz;
@@ -507,49 +469,41 @@
     }
     
     NSString *predictedClassName = className;
-    if (testClassName(predictedClassName))
-    {
+    if (testClassName(predictedClassName)) {
         return testClassName(predictedClassName);
     }
     
     predictedClassName = [NSString stringWithFormat:@"%@.%@", appName ,className];
-    if (testClassName(predictedClassName))
-    {
+    if (testClassName(predictedClassName)) {
         return testClassName(predictedClassName);
     }
     
     // EX: if keyword is "posts" try to find a class named "Post"
-    if ([className hasSuffix:@"s"])
-    {
+    if ([className hasSuffix:@"s"]) {
         NSString *classNameWithoutS = [className substringToIndex:className.length-1];
         
         predictedClassName = [NSString stringWithFormat:@"%@", classNameWithoutS];
-        if (testClassName(predictedClassName))
-        {
+        if (testClassName(predictedClassName)) {
             return testClassName(predictedClassName);
         }
         
         predictedClassName = [NSString stringWithFormat:@"%@.%@", appName, classNameWithoutS];
-        if (testClassName(predictedClassName))
-        {
+        if (testClassName(predictedClassName)) {
             return testClassName(predictedClassName);
         }
     }
     
     // EX: if keyword is "addresses" try to find a class named "Address"
-    if ([className hasSuffix:@"es"])
-    {
+    if ([className hasSuffix:@"es"]) {
         NSString *classNameWithoutEs = [className substringToIndex:className.length-2];
         
         predictedClassName = [NSString stringWithFormat:@"%@", classNameWithoutEs];
-        if (testClassName(predictedClassName))
-        {
+        if (testClassName(predictedClassName)) {
             return testClassName(predictedClassName);
         }
         
         predictedClassName = [NSString stringWithFormat:@"%@.%@", appName, classNameWithoutEs];
-        if (testClassName(predictedClassName))
-        {
+        if (testClassName(predictedClassName)) {
             return testClassName(predictedClassName);
         }
     }
@@ -557,31 +511,25 @@
     return result;
 }
 
-- (NSDate *)dateFromString:(NSString *)string forProperty:(NSString *)property andClass:(Class)class
-{
+- (NSDate *)dateFromString:(NSString *)string forProperty:(NSString *)property andClass:(Class)class {
     NSDate *date;
     NSDateFormatter *customDateFormatter = [self.mappingProvider dateFormatterForClass:class andPropertyKey:property];
     
-    if (customDateFormatter)
-    {
+    if (customDateFormatter) {
         date = [customDateFormatter dateFromString:string];
         ILog(@"attempting to convert date '%@' on property '%@' for class [%@] using 'customDateFormatter' (%@)", date, property, NSStringFromClass(class), customDateFormatter.dateFormat);
     }
-    else if (self.defaultDateFormatter)
-    {
+    else if (self.defaultDateFormatter) {
         date = [self.defaultDateFormatter dateFromString:string];
         ILog(@"attempting to convert '%@' on property '%@' for class [%@] using 'defaultDateFormatter' (%@)", date, property, NSStringFromClass(class), self.defaultDateFormatter.dateFormat);
     }
     
-    if (!date)
-    {
-        for (NSDateFormatter *dateFormatter in self.commonDateFormaters)
-        {
+    if (!date) {
+        for (NSDateFormatter *dateFormatter in self.commonDateFormaters) {
             date = [dateFormatter dateFromString:string];
             ILog(@"attempting to convert date(%@) on property(%@) for class(%@) using 'commonDateFormaters' (%@)", date, property, NSStringFromClass(class), dateFormatter.dateFormat);
             
-            if (date)
-            {
+            if (date) {
                 ILog(@"Converted date(%@) on property(%@) for class(%@) using 'commonDateFormaters' (%@)", date, property, NSStringFromClass(class), dateFormatter.dateFormat);
                 break;
             }
@@ -595,44 +543,43 @@
     return date;
 }
 
-- (NSMutableArray *)commonDateFormaters
-{
-    if (!_commonDateFormaters)
-    {
-        _commonDateFormaters = [NSMutableArray array];
+- (NSMutableArray *)commonDateFormaters {
+    
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        self->_commonDateFormaters = [NSMutableArray array];
         
         NSDateFormatter *formatter1 = [[NSDateFormatter alloc] init];
         formatter1.dateFormat = @"yyyy-MM-dd";
-        [_commonDateFormaters addObject:formatter1];
+        [self->_commonDateFormaters addObject:formatter1];
         
         NSDateFormatter *formatter2 = [[NSDateFormatter alloc] init];
         formatter2.dateFormat = @"MM/dd/yyyy";
-        [_commonDateFormaters addObject:formatter2];
+        [self->_commonDateFormaters addObject:formatter2];
         
         NSDateFormatter *formatter3 = [[NSDateFormatter alloc] init];
         formatter3.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ";
-        [_commonDateFormaters addObject:formatter3];
+        [self->_commonDateFormaters addObject:formatter3];
         
         NSDateFormatter *formatter4 = [[NSDateFormatter alloc] init];
         formatter4.dateFormat = @"yyyy-MM-dd HH:mm:ss";
-        [_commonDateFormaters addObject:formatter4];
+        [self->_commonDateFormaters addObject:formatter4];
         
         NSDateFormatter *formatter5 = [[NSDateFormatter alloc] init];
         formatter5.dateFormat = @"MM/dd/yyyy HH:mm:ss aaa";
-        [_commonDateFormaters addObject:formatter5];
+        [self->_commonDateFormaters addObject:formatter5];
         
         NSDateFormatter *formatter6 = [[NSDateFormatter alloc] init];
         formatter6.dateFormat = @"yyyy-MM-dd'T'HH:mm:ss'Z'";
-        [_commonDateFormaters addObject:formatter6];
-    }
+        [self->_commonDateFormaters addObject:formatter6];
+    });
     
     return _commonDateFormaters;
 }
 
-- (NSString *)typeForProperty:(NSString *)property andClass:(Class)class
-{
+- (NSString *)typeForProperty:(NSString *)property andClass:(Class)class {
     NSString *key = [NSString stringWithFormat:@"%@.%@", NSStringFromClass(class), property];
-    NSString *className = self.mappedPropertyNames[key];
+    NSString *className = [self.mappedPropertyNames objectForKey:key];
     if (className.length) {
         return className;
     }
@@ -647,7 +594,7 @@
     
     NSAssert(className.length, @"Wrong Class for key: %@", key);
     if (className.length) {
-        self.mappedPropertyNames[key] = className;
+        [self.mappedClassNames setObject:className forKey:key];
     }
     
     return className;

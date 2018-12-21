@@ -32,15 +32,6 @@
 @interface InCodeMappingProvider : NSObject <MappingProvider>
 
 /**
- *  Defaults to true, and if the value is true
- *  If true, for every dictionary-to-property mapping, it creates an inverse mapping
- *  So when a mapping is written to convert a dictionary key named "dob" to a property named "dateOfBirth"
- *  an inverse mapping is generated. Next time you convert that object to a dictionary, 
- *  the dictionary key would be named "dob",which is mapped from a property named "dateOfBirth"
- */
-@property (nonatomic, assign) BOOL automaticallyGenerateInverseMapping;
-
-/**
  *  Set key/property Mapping to be used for converting a dictionary to a model object
  *
  *  @param dictionaryKey NSString key in the dictionary
