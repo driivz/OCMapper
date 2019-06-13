@@ -64,7 +64,7 @@ typedef id (^MappingTransformer)(id currentNode, id parentNode);
 + (NSString *)oc_javaArrayNameKey;
 + (NSString *)oc_javaHashSetNameKey;
 + (NSString *)oc_javaHashMapNameKey;
-
++ (NSString *)oc_javaTreeMapNameKey;
 + (NSString *)oc_javaDateNameKey;
 + (NSString *)oc_javaMathTimestampNameKey;
 + (NSString *)oc_javaSQLTimestampNameKey;

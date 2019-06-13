@@ -221,7 +221,8 @@
     }
     
     NSString *className = value[[ObjectMappingInfo oc_javaClassNameKey]];
-    if ([className isEqualToString:[ObjectMappingInfo oc_javaHashMapNameKey]]) {
+    if ([className isEqualToString:[ObjectMappingInfo oc_javaHashMapNameKey]]
+        || [className isEqualToString:[ObjectMappingInfo oc_javaTreeMapNameKey]]) {
         [value enumerateKeysAndObjectsUsingBlock:^(NSString *key, id  _Nonnull obj, BOOL * _Nonnull stop) {
             if ([key rangeOfString:[NSString stringWithFormat:@"\"%@\"", [ObjectMappingInfo oc_javaClassNameKey]]].location != NSNotFound) {
                 NSData *data = [key dataUsingEncoding:NSUTF8StringEncoding];

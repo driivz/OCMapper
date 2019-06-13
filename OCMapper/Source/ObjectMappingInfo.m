@@ -83,6 +83,10 @@
     return @"java.util.HashMap";
 }
 
++ (NSString *)oc_javaTreeMapNameKey {
+    return @"java.util.TreeMap";
+}
+
 + (NSString *)oc_javaDateNameKey {
     return @"java.util.Date";
 }
