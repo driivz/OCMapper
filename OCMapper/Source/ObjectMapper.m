@@ -282,80 +282,75 @@
     id object = [self.instanceProvider emptyInstanceForClass:class];
     
     for (NSString *key in normalizedSource) {
-        @autoreleasepool
-        {
-            ObjectMappingInfo *mappingInfo = [self.mappingProvider mappingInfoForClass:class andDictionaryKey:key];
-            id value = normalizedSource[key];
-            NSString *propertyName = @"";
-            MappingTransformer mappingTransformer;
-            Class objectType;
-            id nestedObject;
+        ObjectMappingInfo *mappingInfo = [self.mappingProvider mappingInfoForClass:class andDictionaryKey:key];
+        id value = normalizedSource[key];
+        NSString *propertyName = key;
+        MappingTransformer mappingTransformer;
+        Class objectType;
+        id nestedObject;
+        
+        if (mappingInfo) {
+            propertyName = [self.instanceProvider propertyNameForObject:object byCaseInsensitivePropertyName:mappingInfo.propertyKey];
+            objectType = mappingInfo.objectType;
+            mappingTransformer = mappingInfo.transformer;
+        }
+        else {
+            if (propertyName && ([value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSArray class]])) {
+                if ([value isKindOfClass:[NSDictionary class]]) {
+                    objectType = [self classFromString:[self typeForProperty:propertyName andClass:class]];
+                }
+                
+                if (!objectType) {
+                    objectType = [self classFromString:key];
+                }
+            }
+        }
+        
+        if (class && object && propertyName.length && [object respondsToSelector:NSSelectorFromString(propertyName)]) {
+            ILog(@"Mapping key(%@) to property(%@) from data(%@)", key, propertyName, [value class]);
             
-            if (mappingInfo) {
-                propertyName = [self.instanceProvider propertyNameForObject:object byCaseInsensitivePropertyName:mappingInfo.propertyKey];
-                objectType = mappingInfo.objectType;
-                mappingTransformer = mappingInfo.transformer;
+            if (mappingTransformer) {
+                nestedObject = mappingTransformer(value, source);
+            }
+            else if ([value isKindOfClass:[NSDictionary class]]) {
+                nestedObject = [self dr_processDictionary:value forClass:objectType];
+            }
+            else if ([value isKindOfClass:[NSArray class]]) {
+                nestedObject = [self processArray:value forClass:objectType];
             }
             else {
-                propertyName = [self.instanceProvider propertyNameForObject:object byCaseInsensitivePropertyName:key];
+                NSString *propertyTypeString = [self typeForProperty:propertyName andClass:class];
                 
-                if (propertyName && ([value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSArray class]])) {
-                    if ([value isKindOfClass:[NSDictionary class]]) {
-                        objectType = [self classFromString:[self typeForProperty:propertyName andClass:class]];
-                    }
-                    
-                    if (!objectType) {
-                        objectType = [self classFromString:key];
-                    }
-                }
-            }
-            
-            if (class && object && propertyName.length && [object respondsToSelector:NSSelectorFromString(propertyName)]) {
-                ILog(@"Mapping key(%@) to property(%@) from data(%@)", key, propertyName, [value class]);
-                
-                if (mappingTransformer) {
-                    nestedObject = mappingTransformer(value, source);
-                }
-                else if ([value isKindOfClass:[NSDictionary class]]) {
-                    nestedObject = [self dr_processDictionary:value forClass:objectType];
-                }
-                else if ([value isKindOfClass:[NSArray class]]) {
-                    nestedObject = [self processArray:value forClass:objectType];
-                }
-                else {
-                    NSString *propertyTypeString = [self typeForProperty:propertyName andClass:class];
-                    
-                    // Convert NSString to NSDate if needed
-                    if ([propertyTypeString isEqualToString:@"NSDate"]) {
-                        if ([value isKindOfClass:[NSDate class]]) {
-                            nestedObject = value;
-                        }
-                        else if ([value isKindOfClass:[NSString class]]) {
-                            nestedObject = [self dateFromString:value forProperty:propertyName andClass:class];
-                        }
-                    }
-                    // Convert NSString to NSNumber if needed
-                    else if ([propertyTypeString isEqualToString:@"NSNumber"] && [value isKindOfClass:[NSString class]]) {
-                        nestedObject = @([value doubleValue]);
-                    }
-                    // Convert NSNumber to NSString if needed
-                    else if ([propertyTypeString isEqualToString:@"NSString"] && [value isKindOfClass:[NSNumber class]]) {
-                        nestedObject = [value stringValue];
-                    }
-                    else {
+                // Convert NSString to NSDate if needed
+                if ([propertyTypeString isEqualToString:@"NSDate"]) {
+                    if ([value isKindOfClass:[NSDate class]]) {
                         nestedObject = value;
                     }
+                    else if ([value isKindOfClass:[NSString class]]) {
+                        nestedObject = [self dateFromString:value forProperty:propertyName andClass:class];
+                    }
                 }
-                
-                if ([nestedObject isKindOfClass:[NSNull class]]) {
-                    nestedObject = nil;
+                // Convert NSString to NSNumber if needed
+                else if ([propertyTypeString isEqualToString:@"NSNumber"] && [value isKindOfClass:[NSString class]]) {
+                    nestedObject = @([value doubleValue]);
                 }
-                
-                [object setValue:nestedObject forKey:propertyName];
+                // Convert NSNumber to NSString if needed
+                else if ([propertyTypeString isEqualToString:@"NSString"] && [value isKindOfClass:[NSNumber class]]) {
+                    nestedObject = [value stringValue];
+                }
+                else {
+                    nestedObject = value;
+                }
             }
-            else {
-                WLog(@"Unable to map from  key(%@) to property(%@) for class (%@)", key, propertyName, NSStringFromClass(class));
+            
+            if ([nestedObject isKindOfClass:[NSNull class]]) {
+                nestedObject = nil;
             }
+            
+            [object setValue:nestedObject forKey:propertyName];
+        }
+        else {
+            WLog(@"Unable to map from  key(%@) to property(%@) for class (%@)", key, propertyName, NSStringFromClass(class));
         }
     }
     
