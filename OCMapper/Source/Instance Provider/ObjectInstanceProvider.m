@@ -28,7 +28,7 @@
 #import "ObjectInstanceProvider.h"
 
 @interface ObjectInstanceProvider()
-@property (nonatomic, strong) NSMutableDictionary *propertyNameDictionary;
+@property (atomic, strong) NSMutableDictionary *propertyNameDictionary;
 @end
 
 @implementation ObjectInstanceProvider
@@ -72,12 +72,7 @@
     
     NSString *key = [NSString stringWithFormat:@"%@.%@", currentClassName, caseInsensitivePropertyName];
     
-    __weak typeof(self) weak = self;
-    NSString *(^checkProcessedKyes)(NSString *) = ^(NSString *key) {
-        return [weak.propertyNameDictionary objectForKey:key];
-    };
-    
-    NSString *value = checkProcessedKyes(key);
+    NSString *value = [self.propertyNameDictionary objectForKey:key];
     if (value.length)
     {
         return value;
@@ -103,7 +98,7 @@
         currentClass = class_getSuperclass(currentClass);
     }
     
-    return checkProcessedKyes(key);
+    return [self.propertyNameDictionary objectForKey:key];
 }
 
 @end

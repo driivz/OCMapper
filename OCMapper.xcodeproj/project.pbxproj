@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -521,12 +521,13 @@
 		15B554A2171B7B3B0058E159 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = OC;
 				LastTestingUpgradeCheck = 0610;
 				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Aryan Ghassemi";
 			};
 			buildConfigurationList = 15B554A5171B7B3B0058E159 /* Build configuration list for PBXProject "OCMapper" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -713,7 +714,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "OCMApper/OCMapper-Bridging-Header.h";
@@ -758,7 +762,10 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -810,7 +817,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OCMapper/OCMapper-Prefix.pch";
 				INFOPLIST_FILE = "OCMapperTests/OCMapperTests-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aryaxt.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = OCMapperTests;
 				SWIFT_OBJC_BRIDGING_HEADER = "OCMapper/OCMapperTests-Bridging-Header.h";
@@ -830,7 +841,11 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "OCMapper/OCMapper-Prefix.pch";
 				INFOPLIST_FILE = "OCMapperTests/OCMapperTests-Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.aryaxt.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = OCMapperTests;
 				SWIFT_OBJC_BRIDGING_HEADER = "OCMapper/OCMapperTests-Bridging-Header.h";

@@ -47,8 +47,8 @@
 
 @interface ObjectMapper()
 @property (nonatomic, strong) NSMutableArray *commonDateFormaters;
-@property (nonatomic, strong) NSMutableDictionary *mappedClassNames;
-@property (nonatomic, strong) NSMutableDictionary *mappedPropertyNames;
+@property (atomic, strong) NSMutableDictionary *mappedClassNames;
+@property (atomic, strong) NSMutableDictionary *mappedPropertyNames;
 @property (nonatomic, strong) ObjectInstanceProvider *instanceProvider;
 @end
 
