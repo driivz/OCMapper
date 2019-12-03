@@ -580,7 +580,7 @@
         return className;
     }
     
-    objc_property_t *proprty_t = class_getProperty(class, property.UTF8String);
+    objc_property_t proprty_t = class_getProperty(class, property.UTF8String);
     if (proprty_t) {
         //if server > app need skip new fields
         const char *type = property_getAttributes(proprty_t);
