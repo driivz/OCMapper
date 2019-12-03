@@ -94,8 +94,11 @@
         {
             objc_property_t property = properties[i];
             NSString *propertyName = @(property_getName(property));
-            NSString *propertyKey = [NSString stringWithFormat:@"%@.%@", currentClassName, propertyName];
-            [self.propertyNameDictionary setObject:propertyName forKey:propertyKey];
+            if (propertyName.length) {
+                //if server > app need skip new fields
+                NSString *propertyKey = [NSString stringWithFormat:@"%@.%@", currentClassName, propertyName];
+                [self.propertyNameDictionary setObject:propertyName forKey:propertyKey];
+            }
         }
         
         free(properties);

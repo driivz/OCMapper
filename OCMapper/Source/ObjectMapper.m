@@ -580,15 +580,19 @@
         return className;
     }
     
-    const char *type = property_getAttributes(class_getProperty(class, property.UTF8String));
-    NSString *typeString = @(type);
-    NSArray *attributes = [typeString componentsSeparatedByString:@","];
-    NSString *typeAttribute = attributes.firstObject;
-    className = [[[typeAttribute substringFromIndex:1]
-                  stringByReplacingOccurrencesOfString:@"@" withString:@""]
-                 stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+    objc_property_t *proprty_t = class_getProperty(class, property.UTF8String);
+    if (proprty_t) {
+        //if server > app need skip new fields
+        const char *type = property_getAttributes(proprty_t);
+        NSString *typeString = @(type);
+        NSArray *attributes = [typeString componentsSeparatedByString:@","];
+        NSString *typeAttribute = attributes.firstObject;
+        className = [[[typeAttribute substringFromIndex:1]
+                      stringByReplacingOccurrencesOfString:@"@" withString:@""]
+                     stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+    }
     
-    NSAssert(className.length, @"Wrong Class for key: %@", key);
+    //NSAssert(className.length, @"Wrong Class for key: %@", key);
     if (className.length) {
         [self.mappedClassNames setObject:className forKey:key];
     }
