@@ -26,6 +26,7 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
+#import "NSObject+ObjectMapper.h"
 
 /**
  *  Definition of a block that is called when a data transformer is set.

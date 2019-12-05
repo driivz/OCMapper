@@ -26,7 +26,6 @@
 // THE SOFTWARE.
 
 #import <Foundation/Foundation.h>
-#import "NSObject+ObjectMapper.h"
 
 @protocol MappingProvider, LoggingProvider, InstanceProvider;
 
