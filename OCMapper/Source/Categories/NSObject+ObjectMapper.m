@@ -62,7 +62,8 @@
 }
 
 - (NSArray *)javaTimestamp {
-    return @[];
+    NSString *timeString = [NSString stringWithFormat:@"%.0f", (((NSDate *)self).timeIntervalSince1970 * 1000)];
+    return @[@"java.util.Date", timeString];
 }
 
 - (NSDictionary *)dictionary
