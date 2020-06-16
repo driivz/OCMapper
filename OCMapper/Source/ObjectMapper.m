@@ -458,6 +458,7 @@
     }
     
     NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleNameKey];
+    appName = [appName stringByReplacingOccurrencesOfString:@" " withString:@"_"];
     
     if (className.length) {
         className = [className stringByReplacingCharactersInRange:NSMakeRange(0, 1)
@@ -585,11 +586,23 @@
         //if server > app need skip new fields
         const char *type = property_getAttributes(proprty_t);
         NSString *typeString = @(type);
+        
         NSArray *attributes = [typeString componentsSeparatedByString:@","];
         NSString *typeAttribute = attributes.firstObject;
         className = [[[typeAttribute substringFromIndex:1]
                       stringByReplacingOccurrencesOfString:@"@" withString:@""]
                      stringByReplacingOccurrencesOfString:@"\"" withString:@""];
+        
+        NSRange searchedRange = NSMakeRange(0, className.length);
+        NSString *pattern = @"(?<=\\d)(?=\\D)|(?=\\d)(?<=\\D)";
+        NSError *error;
+        NSRegularExpression *regex = [NSRegularExpression regularExpressionWithPattern:pattern options:0 error:&error];
+        NSArray *matches = [regex matchesInString:className options:0 range:searchedRange];
+        if (matches.count > 1) {
+            NSTextCheckingResult *checkingResult = matches.lastObject;
+            NSString* substringForMatch = [className substringWithRange:NSMakeRange(checkingResult.range.location, className.length - checkingResult.range.location)];
+            className = substringForMatch;
+        }
     }
     
     //NSAssert(className.length, @"Wrong Class for key: %@", key);
